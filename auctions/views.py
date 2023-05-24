@@ -3,8 +3,9 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from .auction_forms import *
 
-from .models import User
+from .models import User, Listing, Bids, Coments
 
 
 def index(request):
@@ -65,5 +66,9 @@ def register(request):
 
 # last finished
 def add_listing(request):
-    return render(request, 'auctions/index.html')
+    add_listing_form = CreateListingForm()
+    return render(request, 'auctions/add_listing.html', {
+        'add_listing_form': CreateListingForm(),
+        'categories': Listing().CATEGORIES
+    })
     
