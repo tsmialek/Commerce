@@ -15,8 +15,10 @@ class Listing(models.Model):
     seller = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'listings')
     current_bid = models.DecimalField(max_digits=MAX_DIGITS, decimal_places=DECIMAL_PLACES)
     starting_price = models.DecimalField(max_digits=MAX_DIGITS, decimal_places=DECIMAL_PLACES)
+    time_added = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField()
     photo_url = models.URLField(blank=True, null=True)
+    active = models.BooleanField(auto_created=True)
     
     def __str__(self):
         return self.title

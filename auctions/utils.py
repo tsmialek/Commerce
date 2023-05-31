@@ -1,4 +1,6 @@
 import requests
+from .models import *
+
 
 def is_valid_image_url(url):
     if url is None:

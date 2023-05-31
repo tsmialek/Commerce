@@ -6,12 +6,9 @@ from django.urls import reverse
 from .auction_forms import *
 from .utils import is_valid_image_url
 from .auctions_const import *
+from django.utils import timezone
 
 from .models import *
-
-
-def index(request):
-    return render(request, "auctions/index.html")
 
 
 def login_view(request):
@@ -25,7 +22,7 @@ def login_view(request):
         # Check if authentication successful
         if user is not None:
             login(request, user)
-            return HttpResponseRedirect(reverse("index"))
+            return HttpResponseRedirect(reverse("active_listings"))
         else:
             return render(request, "auctions/login.html", {
                 "message": "Invalid username and/or password."
@@ -36,7 +33,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect(reverse("index"))
+    return HttpResponseRedirect(reverse("active_listings"))
 
 
 def register(request):
@@ -96,3 +93,14 @@ def add_listing(request):
         'categories': CATEGORIES,
     })
     
+def active_listings(request):
+    active = Listing.objects.filter(end_time__gt=timezone.now(), active=True).order_by('-time_added')
+    return render(request, 'auctions/active_listings.html', {
+        'active_listings': active,
+    })
+
+def listing_page(request, id):
+    current = Listing.objects.get(id=id)
+    return render(request, 'auctions/listing_page.html', {
+        'listing': current,
+    })
