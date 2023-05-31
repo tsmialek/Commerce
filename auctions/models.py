@@ -2,25 +2,19 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
+from .auctions_const import *
 
 
 class User(AbstractUser):
     pass
 
 class Listing(models.Model):
-    CATEGORIES = [
-        ('electronics', 'Electronics'),
-        ('fashion', 'Fashion'),
-        ('sport', 'Sport'),
-        ('home', 'Home'),
-        ('health', 'Health')
-    ]
-    title = models.CharField(max_length=255, null=False)
+    title = models.CharField(max_length=LONG_TEXT, null=False)
     description = models.TextField()
-    category = models.CharField(max_length=64, choices=CATEGORIES, null=True)
+    category = models.CharField(max_length=SHORT_TEXT, choices=CATEGORIES, null=True)
     seller = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'listings')
-    current_bid = models.DecimalField(max_digits=10, decimal_places=2)
-    starting_price = models.DecimalField(max_digits=10, decimal_places=2)
+    current_bid = models.DecimalField(max_digits=MAX_DIGITS, decimal_places=DECIMAL_PLACES)
+    starting_price = models.DecimalField(max_digits=MAX_DIGITS, decimal_places=DECIMAL_PLACES)
     end_time = models.DateTimeField()
     photo_url = models.URLField(blank=True, null=True)
     
@@ -40,7 +34,7 @@ class Coments(models.Model):
     
 
 class Bids(models.Model):
-    bid_amount = models.DecimalField(max_digits=10, decimal_places=2, default=10)
+    bid_amount = models.DecimalField(max_digits=MAX_DIGITS, decimal_places=DECIMAL_PLACES, default=10)
     bidder = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_bids')
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='listing_bids')
     timestamp = models.DateTimeField(auto_now_add=True)
