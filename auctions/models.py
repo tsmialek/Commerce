@@ -6,7 +6,7 @@ from .auctions_const import *
 
 
 class User(AbstractUser):
-    pass
+    watchlist = models.ManyToManyField('Listing', blank=True, related_name='watchlist')
 
 class Listing(models.Model):
     title = models.CharField(max_length=LONG_TEXT, null=False)
@@ -22,7 +22,6 @@ class Listing(models.Model):
     
     def __str__(self):
         return self.title
-    
 
 class Coments(models.Model):
     rating = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])

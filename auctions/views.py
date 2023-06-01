@@ -101,6 +101,21 @@ def active_listings(request):
 
 def listing_page(request, id):
     current = Listing.objects.get(id=id)
+    if request.user.is_authenticated:
+        is_assigned = request.user.watchlist.filter(id=current.id).exists()
+    else:
+        is_assigned = False
+
     return render(request, 'auctions/listing_page.html', {
         'listing': current,
+        'is_assigned': is_assigned,
     })
+
+def watchlist(request, id):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            listing = Listing.objects.get(id=id)
+            user.watchlist.add(listing)
+
+        return HttpResponseRedirect(reverse("listing_page", args=(id,)))
