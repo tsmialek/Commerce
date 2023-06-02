@@ -2,7 +2,20 @@
 
 {% block body %}
 
-<p>Added by {{ listing.seller }}</p>
+<p>Added by {{ listing.seller }} | {{ listing.time_added }}</p>
+
+{% comment %} An ability to close an auction {% endcomment %}
+{% if listing.seller == user and listing.active %}
+    <form action="{% url 'inactive' listing.id %}" method="post">
+    {% csrf_token %}
+    <input class="btn btn-primary mb-3" type="submit" value="Close auction">
+    </form>
+{% elif not listing.active %}
+    <p style="color: red">inactive</p>
+    {% if listing.winner %}
+        <p>Winner: {{ listing.winner.username }}</p>
+    {% endif %}
+{% endif %}
 <h1 class="title">{{ listing.title }}</h1>
 <h3 class="description">Description: </h3>
 <p>{{ listing.description }}</p>
@@ -10,7 +23,7 @@
 <p>Starting price: {{ listing.starting_price }} | Current bid: {{ listing.current_bid }}</p>
 
 {% comment %} Placing bid is user is authenticated {% endcomment %}
-{% if user.is_authenticated %}
+{% if user.is_authenticated and listing.active %}
 <form action="{% url 'listing_page' listing.id %}" method="post">
     {% csrf_token %}
     <label for="bid">Place your bid: </label>
@@ -20,19 +33,18 @@
 
 {% comment %} Adding to watchlist {% endcomment %}
 {% if not is_assigned %}
-    <form action="{% url 'watchlist' listing.id %}" method="post">
+    <form action="{% url 'watchlist_management' listing.id %}" method="post">
         {% csrf_token %}
         <input type="submit" value="Add to watchlist">
     </form>
 {% else %}
-    <form action="{% url 'watchlist' listing.id %}" method="post">
+    <form action="{% url 'watchlist_management' listing.id %}" method="post">
         {% csrf_token %}
         <input type="submit" value="Remove from watchlist">
     </form>
 {% endif %}
 
 {% else %}
-<p>Login to place bids or to add listings to your watchlist</p>
 {% endif %}
 
 {% endblock body %}

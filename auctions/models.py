@@ -13,6 +13,7 @@ class Listing(models.Model):
     description = models.TextField()
     category = models.CharField(max_length=SHORT_TEXT, choices=CATEGORIES, null=True)
     seller = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'listings')
+    winner = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'winned_bets', null=True, blank=True)
     current_bid = models.DecimalField(max_digits=MAX_DIGITS, decimal_places=DECIMAL_PLACES)
     starting_price = models.DecimalField(max_digits=MAX_DIGITS, decimal_places=DECIMAL_PLACES)
     time_added = models.DateTimeField(auto_now_add=True)

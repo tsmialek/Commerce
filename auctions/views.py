@@ -86,7 +86,7 @@ def add_listing(request):
             })
         else: 
             seller_id = request.user
-            listing = Listing(title=title, description=description, category=category, end_time=end_time, starting_price=starting_price, photo_url=photo_url, current_bid=starting_price, seller=seller_id)
+            listing = Listing(title=title, description=description, category=category, end_time=end_time, starting_price=starting_price, photo_url=photo_url, current_bid=starting_price, seller=seller_id, active=True)
             listing.save()
             
     return render(request, 'auctions/add_listing.html', {
@@ -111,11 +111,37 @@ def listing_page(request, id):
         'is_assigned': is_assigned,
     })
 
-def watchlist(request, id):
+def watchlist_management(request, id):
     if request.method == 'POST':
         if request.user.is_authenticated:
-            user = request.user
-            listing = Listing.objects.get(id=id)
-            user.watchlist.add(listing)
+            if request.user.watchlist.filter(id=id).exists():
+                listing = Listing.objects.get(id=id)
+                request.user.watchlist.remove(listing)
+            else:
+                user = request.user
+                listing = Listing.objects.get(id=id)
+                user.watchlist.add(listing)
 
         return HttpResponseRedirect(reverse("listing_page", args=(id,)))
+
+def make_listing_inactive(request, id):
+    listing = Listing.objects.get(id=id)
+    listing.active = False
+    listing.save()
+
+    if listing.current_bid.bidder != lisgint.seller:
+        listing.winner = listing.current_bid.bidder
+
+    return HttpResponseRedirect(reverse("listing_page", args=(id,)))
+
+def watchlist(request, username):
+    my_list = request.user.watchlist.all()
+    return render(request, 'auctions/listing_offers.html', {
+        'my_list': my_list,
+    })
+
+def my_offers(request, username):
+    my_list = request.user.listings.all()
+    return render(request, 'auctions/listing_offers.html', {
+        'my_list': my_list,
+    })
